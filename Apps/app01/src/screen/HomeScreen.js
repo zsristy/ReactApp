@@ -1,14 +1,19 @@
 import React from 'react';
 import { StyleSheet, Text, View ,Image,TouchableOpacity,Button} from 'react-native';
 
-const HomeScreen = () => {
+const HomeScreen = (props) => {
     return(
         <View>
             <Image style={styles.imageStyle} source={require('./../../assets/Iut.png')}/>
             <Text style={styles.textStyle}>Department of CSE</Text>
             <Text style={styles.textStyle}>Programme: SWE</Text>
-            <TouchableOpacity style={styles.touchableStyle}>
-            <Text style={styles.touchabletextStyle}>My Profile</Text>            
+            <TouchableOpacity style={styles.touchableStyle}
+            onPress={
+                function(){
+                        props.navigation.navigate('Profile');
+                }
+            }>
+            <Text style={styles.touchabletextStyle}>My Profile</Text>      
             </TouchableOpacity>
             <Button
             title='Semesterwise Course List'
@@ -17,6 +22,11 @@ const HomeScreen = () => {
             <Button
             title='List of Faculty Member'
             color='steelblue'
+            onPress={
+                function(){
+                        props.navigation.navigate('Faculty List');
+                }
+            }
             />
         </View>
     );
