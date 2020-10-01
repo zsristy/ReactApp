@@ -13,7 +13,7 @@ const ProfileScreen = () => {
             <Text style={styles.textStyle}>  Name : {name}</Text>
             <Text style={styles.textStyle}>  Student ID : {sid}</Text>
             <Text style={styles.textStyle}>  Room no : {roomno}</Text>
-            <Text style={styles.textStyle}>  Student ID : {email}</Text>        
+            <Text style={styles.textStyle}>  Email : {email}</Text>        
         </View>
 
     );

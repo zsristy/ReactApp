@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View ,FlatList} from 'react-native';
 
-const FacultylistScreenScreen = () => {
+const FacultylistScreen = () => {
     const faculty=[
         {name: "AHK",key: '01'},
         {name: "AAK",key: '02'},
@@ -36,9 +36,8 @@ const styles = StyleSheet.create(
             marginLeft: 10,
             marginTop:10,
             marginRight: 10,
-            fontWeight: 'bold'
         }
     }
 )
 
-export default FacultylistScreenScreen;
+export default FacultylistScreen;

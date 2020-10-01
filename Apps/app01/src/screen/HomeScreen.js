@@ -18,6 +18,11 @@ const HomeScreen = (props) => {
             <Button
             title='Semesterwise Course List'
             color='skyblue'
+            onPress={
+                function(){
+                        props.navigation.navigate('Semester');
+                }
+            }
             />
             <Button
             title='List of Faculty Member'
