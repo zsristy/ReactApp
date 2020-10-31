@@ -27,7 +27,7 @@ const NotificationScreen = (props) => {
               },
             }}
           />
-          <ImageBackground source={require('./../../assets/08.jpg')} style={styles.imageStyle}>
+          <ImageBackground source={require('./../../assets/05.jpg')} style={styles.imageStyle}>
           <ScrollView>
           <Card>
             <View style={{ flexDirection: "row", alignItems: "center" }}>

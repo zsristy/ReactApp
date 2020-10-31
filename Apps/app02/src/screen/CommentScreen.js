@@ -1,5 +1,5 @@
 import React, { useState ,useEffect} from "react";
-import {ImageBackground, SafeAreaView, ScrollView,TouchableOpacity, FlatList, View, StyleSheet } from "react-native";
+import {ImageBackground, SafeAreaView, ScrollView, FlatList, View, StyleSheet } from "react-native";
 import {
   Card,
   Button,
@@ -8,37 +8,39 @@ import {
   Input,
   Header,
 } from "react-native-elements";
-import ShowPostComponent from "../component/ShowPostComponent";
-import WritePostComponent from "../component/WritePostComponent";;
+
+import WriteCommentComponent from "../component/WriteCommentComponent";
+import ShowCommentComponent from "../component/ShowCommentComponent";
 import {getDataJson, getAllindex} from '../function/AsyncstorageFunction';
 import { AuthContext } from "../provider/AuthProvider"
 
 
-const HomeScreen = (props) => {
+const CommentScreen = (props) => {
+  const content=props.route.params.content;
 
-  const [Post, setPost]=useState([]);
+  const [Comment, setComment]=useState([]);
   const [Render, setRender]=useState(false);
-  const getPost = async () =>{
+  const getComment = async () =>{
     setRender(true);
     let keys=await getAllindex();
-    let Allposts=[];
+    let Allcomments=[];
     if(keys!=null){
       for (let k of keys){
-          if(k.startsWith("pid#")){
-            let post= await getDataJson(k);
-            Allposts.push(post);
+          if(k.startsWith("cid#")){
+            let comment= await getDataJson(k);
+            Allcomments.push(comment);
           }
         }
-        setPost(Allposts);
+        setComment(Allcomments);
       }
       else{
-        console.log("No post to show");
+        console.log("No comment to show");
       }
       setRender(false);
     }
 
   useEffect(()=>{
-    getPost();
+    getComment();
   },[]);
 
   return (
@@ -64,17 +66,17 @@ const HomeScreen = (props) => {
               },
             }}/>
 
-          <ImageBackground source={require('./../../assets/07.jpg')} style={styles.imageStyle}>  
+          <ImageBackground source={require('./../../assets/04.jpg')} style={styles.imageStyle}>  
 
-          <WritePostComponent user={auth.CurrentUser}/>
+          <WriteCommentComponent user={auth.CurrentUser} postcontent={content}/>
 
           <FlatList
-          data={Post}
-          onRefresh={getPost}
+          data={Comment}
+          onRefresh={getComment}
           refreshing={Render}
           renderItem={function({item}){
             return(
-              <ShowPostComponent title={item} link={props.navigation}
+              <ShowCommentComponent title={item}
               />
             );
           }}
@@ -105,4 +107,4 @@ const styles = StyleSheet.create({
 },
 });
 
-export default HomeScreen;
+export default CommentScreen;

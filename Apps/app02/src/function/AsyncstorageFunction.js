@@ -47,6 +47,16 @@ const getDataJson = async (key) => {
     }
 };
 
+const getAllindex= async()=>{
+    let keys=[]
+    try{
+        keys = await AsyncStorage.getAllKeys();
+        return keys;
+    }catch(error){
+        alert(error);
+    }
+}
+
 const removeData = async (key) => {
     try{
         await AsyncStorage.removeItem(key);
@@ -56,4 +66,4 @@ const removeData = async (key) => {
     }
 };
 
-export { storeData, storeDataJson, getData, getDataJson, removeData};
+export { storeData, storeDataJson, getData, getDataJson, getAllindex, removeData};

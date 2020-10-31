@@ -11,11 +11,13 @@ import HomeScreen from './src/screen/HomeScreen';
 import NotificationScreen from './src/screen/NotificationScreen';
 import SignupScreen from './src/screen/SignupScreen';
 import SigninScreen from './src/screen/SigninScreen';
-import ProfileScreen from './src/screen/ProfileScreen'
+import ProfileScreen from './src/screen/ProfileScreen';
+import CommentScreen from './src/screen/CommentScreen'
 
 const AuthStack =createStackNavigator();
 const HomeTab = createMaterialBottomTabNavigator();
 const AppDrawer = createDrawerNavigator();
+const HomeStack=createStackNavigator();
 
 const AuthStackScreen=()=>{
   return(
@@ -52,10 +54,23 @@ const HomeTabScreen=()=>{
   );
 }
 
+
+const HomeStackScreen =()=>{
+  return(
+    <HomeStack.Navigator initialRouteName='Home'>
+      <HomeStack.Screen name='Home' component={ HomeTabScreen}  options={{headerShown: false}}/>
+      <HomeStack.Screen name='Comment'component={ CommentScreen} options={{headerShown: false}}/>
+    </HomeStack.Navigator>
+  )
+
+}
+
+
+
 const AppDrawerScreen = () => {
   return (
     <AppDrawer.Navigator>
-      <AppDrawer.Screen name="Home" component={ HomeTabScreen} />
+      <AppDrawer.Screen name="Home" component={ HomeStackScreen} />
       <AppDrawer.Screen name="Profile" component={ProfileScreen} />
 
     </AppDrawer.Navigator>

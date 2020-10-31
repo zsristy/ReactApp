@@ -3,7 +3,9 @@ import { View } from "react-native";
 import { Card, Button, Text, Avatar } from "react-native-elements";
 import { AntDesign } from "@expo/vector-icons";
 
-const CardComponent = (props) => {
+const ShowPostComponent = (props) => {
+  const like=" (10)";
+  const comment=" Comment (7)";
   return (
     <Card>
       <View
@@ -19,28 +21,34 @@ const CardComponent = (props) => {
           activeOpacity={1}
         />
         <Text h4Style={{ padding: 10 }} h4>
-          Sristy
+          {props.title.uname}
         </Text>
-      </View>
-      <Text style={{ fontStyle: "italic" }}> Good Morning </Text>
+        </View>
+        <Text h6Style={{ padding: 10}} h6 style={{alignSelf:"stretch",color:'gray'}}>
+          <Text style={{fontWeight:"bold" ,fontStyle:"italic",color:'gray'}}>Posted at: </Text>{props.title.time}, {props.title.date}
+        </Text>
       <Text
         style={{
           paddingVertical: 10,
         }}
       >
-        Good Morning World.It is a beautiful winter day. And this snow fall is awesome.
+        {props.title.post}
       </Text>
       <Card.Divider />
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Button
           type="outline"
-          title="  Like (17)"
-          icon={<AntDesign name="like2" size={24} color="dodgerblue" />}
+          title={like}
+          icon={<AntDesign name="heart" size={24} color="dodgerblue" />}
         />
-        <Button type="solid" title="Comment (10)" />
+        <Button type="solid" title={comment} onPress={
+          function(){
+            props.link.navigate('Comment',{content: props.title});
+    }
+        }/>
       </View>
     </Card>
   );
 };
 
-export default CardComponent;
+export default ShowPostComponent;
