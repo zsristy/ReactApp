@@ -9,6 +9,7 @@ import {getDataJson} from '../function/AsyncstorageFunction';
 const SigninScreen=(props)=>{
     const [Email, setEmail]=useState("");
     const [Password, setPassword]=useState("");
+
     return(
         <AuthContext.Consumer>
         {(auth)=>(
@@ -55,7 +56,7 @@ const SigninScreen=(props)=>{
                 onPress={
                     function(){
                         props.navigation.navigate('SignUp')
-                    }
+                    }                    
                 }
                 />
 

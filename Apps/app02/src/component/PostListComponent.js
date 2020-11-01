@@ -39,6 +39,15 @@ const PostlistComponent = (props) => {
       <Text style={{fontWeight:"bold" ,fontStyle:"italic",color:'gray'}}>Likes: </Text>{props.title.likecount} 
       <Text style={{fontWeight:"bold" ,fontStyle:"italic",color:'gray'}}> , Comments: </Text>{props.title.commentcount}
         </Text>
+        <Card.Divider />
+      <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+    
+        <Button type="solid" title="Remove" onPress={
+          async function(){
+          await removeData((props.title.pid));
+          }
+        }/>
+        </View>
     </Card>
   );
 };

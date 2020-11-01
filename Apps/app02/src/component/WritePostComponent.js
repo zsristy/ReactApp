@@ -27,7 +27,7 @@ const WritePostComponent = (props) => {
             if(Post.size!=0){
             const id=Math.ceil(Math.random()*1000000000000000);
             let newpost = {
-                pid: "pid#"+id,
+                pid: "pid#"+id+props.user.name,
                 post: Post,
                 uname: props.user.name,
                 date: today,
@@ -35,7 +35,7 @@ const WritePostComponent = (props) => {
                 likecount: 0,
                 commentcount: 0,
             };
-            storeDataJson("pid#"+id, newpost);
+            storeDataJson("pid#"+id+props.user.name, newpost);
             }else{
             alert("Must enter any character");
             }

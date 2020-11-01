@@ -73,11 +73,11 @@ const ShowPostComponent = (props) => {
           }
         }/>
 
-        <Button type="solid" title="Remove" onPress={
+        {/* <Button type="solid" title="Remove" onPress={
           async function(){
           await removeData((props.title.pid));
           }
-        }/>
+        }/> */}
 
       </View>
     </Card>

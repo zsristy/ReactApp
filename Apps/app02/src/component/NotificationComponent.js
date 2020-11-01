@@ -4,6 +4,7 @@ import { Card, Button, Text, Avatar } from "react-native-elements";
 import {getDataJson, getAllindex} from '../function/AsyncstorageFunction';
 
 const NotificationComponent = (props) => {
+  let post= getDataJson(props.title.pid);
   let notation;
   let bcolor;
   let nm;
@@ -18,9 +19,9 @@ const NotificationComponent = (props) => {
       nm="pencil";
   }
   return (
-    
     <TouchableOpacity onPress={function(){
       props.link.navigate('Comment',{content: post._W});
+      console.log(post._W);
     }}>
     <Card>
     <View style={{ flexDirection: "row", alignItems: "center" }}>

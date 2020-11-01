@@ -2,7 +2,7 @@ import React, { useState,useEffect } from "react";
 import { ImageBackground,View, ScrollView, StyleSheet, AsyncStorage,FlatList,Image } from "react-native";
 import { Text, Card, Button, Avatar, Header } from "react-native-elements";
 import { FontAwesome5 } from '@expo/vector-icons';
-import {getDataJson, getAllindex} from '../function/AsyncstorageFunction';
+import {getDataJson, getAllindex, removeData} from '../function/AsyncstorageFunction';
 import PostlistComponent from "../component/PostListComponent";
 import { AuthContext } from "../provider/AuthProvider";
 
@@ -11,6 +11,22 @@ const ProfileScreen = (props) => {
 
   const [Post, setPost]=useState([]);
   const [Render, setRender]=useState(false);
+
+  const deleteprofile =async (name,email) =>
+  {
+      let flag=false
+      let index=await getAllindex();
+      if(index!=null){
+        for(let i of index){
+          if(i.endsWith(name)){
+            await removeData((i));
+          }
+        }
+      }
+      await removeData((email));
+      return flag;
+  }
+
   const getPost = async () =>{
     setRender(true);
     let keys=await getAllindex();
@@ -47,16 +63,15 @@ const ProfileScreen = (props) => {
                 props.navigation.toggleDrawer();
               },
             }}
-            centerComponent={{ text: "The Office", style: { color: "#fff",fontSize: 20 } }}
+            centerComponent={{ text: "The Office", style: { color: "#fff" ,fontSize: 20} }}         
             rightComponent={{
               icon: "lock-outline",
               color: "#fff",
               onPress: function () {
-                auth.setIsLoggedIn(false);
+                auth.setIsloggedIn(false);
                 auth.setCurrentUser({});
               },
-            }}
-          />
+            }}/>
           
 
           <ImageBackground source={require('./../../assets/08.jpg')} style={styles.imageStyle}>
@@ -78,7 +93,20 @@ const ProfileScreen = (props) => {
               type="solid" 
               title=" Delete Account "
               icon={<FontAwesome5 name="user-times" size={24} color="white" />}
+              onPress={async()=>{
+                let del =await deleteprofile (auth.CurrentUser.name,auth.CurrentUser.email);
+                if(del==false){
+                  alert("User Removed Successfully");
+                  auth.setIsloggedIn(false);
+                  auth.setCurrentUser({});
+              }
+              else{
+                  alert("Delete action unsuccessful");
+              }}
+              }
               />
+
+
             </View>         
             <Text style={styles.textStyle1}>  Born On : {auth.CurrentUser.bornon}</Text>
             <Text style={styles.textStyle1}>  Lives At : {auth.CurrentUser.livesat}</Text>

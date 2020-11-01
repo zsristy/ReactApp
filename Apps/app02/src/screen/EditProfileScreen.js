@@ -13,7 +13,7 @@ const [Worksat, setWorksat]=useState("");
     <AuthContext.Consumer>
       {(auth) => (
         <View style={styles.viewStyle}>
-          <Header
+            <Header
             leftComponent={{
               icon: "menu",
               color: "#fff",
@@ -21,16 +21,15 @@ const [Worksat, setWorksat]=useState("");
                 props.navigation.toggleDrawer();
               },
             }}
-            centerComponent={{ text: "The Office", style: { color: "#fff",fontSize: 20 } }}
+            centerComponent={{ text: "The Office", style: { color: "#fff" ,fontSize: 20} }}         
             rightComponent={{
               icon: "lock-outline",
               color: "#fff",
               onPress: function () {
-                auth.setIsLoggedIn(false);
+                auth.setIsloggedIn(false);
                 auth.setCurrentUser({});
               },
-            }}
-          />
+            }}/>
           <ImageBackground source={require('./../../assets/08.jpg')} style={styles.imageStyle}>
             <Card >
             <Image style={styles.imageStyle1} source={require('./../../assets/profile.png')}/>
