@@ -26,15 +26,15 @@ const CommentScreen = (props) => {
     let Allcomments=[];
     if(keys!=null){
       for (let k of keys){
-          if(k.startsWith("cid#")){
-            let comment= await getDataJson(k);
-            Allcomments.push(comment);
+          if(k.startsWith("cid#") && k.endsWith(content.pid)){
+            let comments= await getDataJson(k);
+            Allcomments.push(comments);
           }
         }
         setComment(Allcomments);
       }
       else{
-        console.log("No comment to show");
+        console.log("No post to show");
       }
       setRender(false);
     }

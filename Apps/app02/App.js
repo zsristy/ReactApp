@@ -12,12 +12,14 @@ import NotificationScreen from './src/screen/NotificationScreen';
 import SignupScreen from './src/screen/SignupScreen';
 import SigninScreen from './src/screen/SigninScreen';
 import ProfileScreen from './src/screen/ProfileScreen';
-import CommentScreen from './src/screen/CommentScreen'
+import CommentScreen from './src/screen/CommentScreen';
+import EditProfileScreen from './src/screen/EditProfileScreen';
 
 const AuthStack =createStackNavigator();
 const HomeTab = createMaterialBottomTabNavigator();
 const AppDrawer = createDrawerNavigator();
 const HomeStack=createStackNavigator();
+const ProfileStack=createStackNavigator();
 
 const AuthStackScreen=()=>{
   return(
@@ -65,13 +67,22 @@ const HomeStackScreen =()=>{
 
 }
 
+const ProfileStackScreen =()=>{
+  return(
+    <ProfileStack.Navigator initialRouteName='Profile'>
+      <ProfileStack.Screen name='Profile' component={ProfileScreen }  options={{headerShown: false}}/>
+      <ProfileStack.Screen name='EditProfile'component={ EditProfileScreen} options={{headerShown: false}}/>
+    </ProfileStack.Navigator>
+  )
+
+}
 
 
 const AppDrawerScreen = () => {
   return (
     <AppDrawer.Navigator>
       <AppDrawer.Screen name="Home" component={ HomeStackScreen} />
-      <AppDrawer.Screen name="Profile" component={ProfileScreen} />
+      <AppDrawer.Screen name="Profile" component={ProfileStackScreen} />
 
     </AppDrawer.Navigator>
   );

@@ -74,7 +74,7 @@ const HomeScreen = (props) => {
           refreshing={Render}
           renderItem={function({item}){
             return(
-              <ShowPostComponent title={item} link={props.navigation}
+              <ShowPostComponent title={item} user={auth.CurrentUser} link={props.navigation}
               />
             );
           }}

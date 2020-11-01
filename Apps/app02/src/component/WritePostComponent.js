@@ -32,6 +32,8 @@ const WritePostComponent = (props) => {
                 uname: props.user.name,
                 date: today,
                 time: currenttime,
+                likecount: 0,
+                commentcount: 0,
             };
             storeDataJson("pid#"+id, newpost);
             }else{

@@ -1,15 +1,15 @@
 import React, { useState,useEffect } from "react";
 import { ImageBackground,View, ScrollView, StyleSheet, AsyncStorage,Image } from "react-native";
-import { Text, Card, Button, Avatar, Header } from "react-native-elements";
+import { Text, Card, Button, Avatar, Header,Input } from "react-native-elements";
 import { FontAwesome5 } from '@expo/vector-icons';
-import {getDataJson, getAllindex} from '../function/AsyncstorageFunction';
+import {storeDataJson, mergeData, removeData} from '../function/AsyncstorageFunction';
 import { AuthContext } from "../provider/AuthProvider";
 
-
-const ProfileScreen = (props) => {
-
+const EditProfileScreen = (props) => { 
+const [Bornon, setBornon]=useState("");
+const [Livesat, setLivesat]=useState("");
+const [Worksat, setWorksat]=useState("");
   return (
-
     <AuthContext.Consumer>
       {(auth) => (
         <View style={styles.viewStyle}>
@@ -31,33 +31,56 @@ const ProfileScreen = (props) => {
               },
             }}
           />
-          
-
           <ImageBackground source={require('./../../assets/08.jpg')} style={styles.imageStyle}>
-            <Card>
+            <Card >
             <Image style={styles.imageStyle1} source={require('./../../assets/profile.png')}/>
             <Text style={styles.textStyle2}> {auth.CurrentUser.name}   </Text>  
             <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginBottom: 40 }}>
-            <Button
+            </View>  
+            <Card.Divider/>      
+            <Input 
+                placeholder='Born On'
+                onChangeText={
+                    function(currentinput){
+                        setBornon(currentinput);
+                    }
+                }
+                ></Input>
+
+                <Input 
+                placeholder='Lives At' 
+                onChangeText={
+                    function(currentinput){
+                        setLivesat(currentinput);
+                    }
+                }
+                ></Input>
+                
+                <Input 
+                placeholder='Works At' 
+                onChangeText={
+                    function(currentinput){
+                        setWorksat(currentinput);
+                    }
+                }
+                ></Input> 
+
+                <Button
               type="solid"
               title=" Edit Account "
               icon={<FontAwesome5 name="user-edit" size={24} color="white" />}
-              onPress={
-                function(){
-                    props.navigation.navigate('EditProfile');
+              onPress={   
+                async function(){
+                await mergeData(auth.CurrentUser.email,JSON.stringify({
+                    bornon: Bornon,
+                    livesat: Livesat,
+                    worksat: Worksat,
+                }))
+                alert("Please logout first and then log in again to see the update :) ");
                 }
             }
             />
-            <Button 
-              type="solid" 
-              title=" Delete Account "
-              icon={<FontAwesome5 name="user-times" size={24} color="white" />}
-              />
-            </View>         
-            <Text style={styles.textStyle1}>  Born On : {auth.CurrentUser.bornon}</Text>
-            <Text style={styles.textStyle1}>  Lives At : {auth.CurrentUser.livesat}</Text>
-            <Text style={styles.textStyle1}>  Works At : {auth.CurrentUser.worksat}</Text> 
-            <Text style={styles.textStyle1}>  </Text>       
+
           </Card>
           </ImageBackground>
         </View>
@@ -91,15 +114,14 @@ textStyle2:{
   color: 'black',
   alignSelf: 'center',
   marginTop:10,
-  marginBottom: 20,
   fontStyle: "italic"
 },
 imageStyle1:{
   height: 200,
   width: 160,
   alignSelf: 'center',
-  marginTop: 120,
+  marginTop: 40,
 },
 });
 
-export default ProfileScreen;
+export default EditProfileScreen;

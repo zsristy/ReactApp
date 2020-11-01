@@ -1,10 +1,37 @@
-import React, { useState } from "react";
-import { ImageBackground,ScrollView, View, StyleSheet, AsyncStorage } from "react-native";
-import { Text, Card, Button, Avatar, Header } from "react-native-elements";
-import { AuthContext } from "../provider/AuthProvider";
-
+import React, { useState ,useEffect} from "react";
+import {ImageBackground, SafeAreaView, ScrollView,TouchableOpacity, FlatList, View, StyleSheet } from "react-native";
+import { Header} from "react-native-elements";
+import {getDataJson, getAllindex} from '../function/AsyncstorageFunction';
+import NotificationComponent from '../component/NotificationComponent';
+import { AuthContext } from "../provider/AuthProvider"
 
 const NotificationScreen = (props) => {
+  const [Notification, setNotification]=useState([]);
+  const [Render, setRender]=useState(false);
+  const getNotification = async () =>{
+    setRender(true);
+    let keys=await getAllindex();
+    let Allnotifications=[];
+    if(keys!=null){
+     for (let k of keys){
+          if(k.startsWith("nid#") ){
+            let notification= await getDataJson(k);
+            Allnotifications.push(notification);
+          }
+        }
+        setNotification(Allnotifications);
+       }
+      else{
+        console.log("No post to show");
+      }
+       setRender(false);
+  }
+
+
+  useEffect(()=>{
+     getNotification();
+  },[]);
+
   return (
     <AuthContext.Consumer>
       {(auth) => (
@@ -27,26 +54,21 @@ const NotificationScreen = (props) => {
               },
             }}
           />
-          <ImageBackground source={require('./../../assets/05.jpg')} style={styles.imageStyle}>
-          <ScrollView>
-          <Card>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Avatar
-                containerStyle={{ backgroundColor: "steelblue" }}
-                rounded
-                icon={{
-                  name: "thumbs-o-up",
-                  type: "font-awesome",
-                  color: "white",
-                }}
-                activeOpacity={1}
-              />
-              <Text style={{ paddingHorizontal: 10 }}>
-                Sristy Liked Your Post.
-              </Text>
-            </View>
-          </Card>
-          </ScrollView>
+          <ImageBackground source={require('./../../assets/05.jpg')} style={styles.imageStyle}> 
+          <FlatList
+          data={Notification}
+          onRefresh={getNotification}
+          refreshing={Render}
+          renderItem={function({item}){
+            if(item.author==auth.CurrentUser.name){
+            return(
+                  <NotificationComponent title={item} link={props.navigation}/>
+            );}
+          }}
+          keyExtractor={(item, index) => index.toString()}
+          >
+          </FlatList> 
+          
           </ImageBackground>
         </View>
       )}

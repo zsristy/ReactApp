@@ -68,6 +68,9 @@ const SignupScreen=(props)=>{
                             email: Email,
                             sid: Sid,
                             password: Password,
+                            bornon: "Not set yet",
+                            livesat: "Not set yet",
+                            worksat: "Not set yet",
                         };
                         storeDataJson(Email,currentuser);
                         props.navigation.navigate('SignIn');

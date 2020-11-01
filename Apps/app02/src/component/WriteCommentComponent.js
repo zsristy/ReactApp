@@ -1,12 +1,12 @@
 import React,{useReducer, useState} from "react";
 import { View } from "react-native";
 import { Card, Button, Text, Avatar, Input } from "react-native-elements";
-import {storeDataJson} from '../function/AsyncstorageFunction';
+import {storeDataJson, mergeData} from '../function/AsyncstorageFunction';
 import { Entypo } from "@expo/vector-icons";
 
 
 const WriteCommentComponent = (props) => {
-    
+    const [Commentno, setCommentno]=useState(props.postcontent.commentcount);
     const [Comment, setComment]=useState("");
     const input = React.createRef();
     let today = new Date().toLocaleDateString();
@@ -35,18 +35,9 @@ const WriteCommentComponent = (props) => {
       >
         {props.postcontent.post}
       </Text>
-      <Card.Divider />
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-      <Button
-          type="solid"
-          title="Checking"
-          onPress={
-            function(){
-                  console.log(props.postcontent)
-            }
-          } 
-          />
-      </View>
+      <Text h6Style={{ padding: 10 }} h6 style={{color:'gray'}}>
+      <Text style={{fontWeight:"bold" ,fontStyle:"italic",color:'gray'}}>Likes: </Text>{props.postcontent.likecount}
+        </Text>
     <Card.Divider />
     <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
     <View style={{width:"75%"}}>
@@ -64,24 +55,42 @@ const WriteCommentComponent = (props) => {
     </View>
     <View style={{width:"25%",justifyContent: "center",marginBottom:20}}>
     <Button title="Comment" type="solid" onPress={
-        function(){
+        async function(){
             if(Comment.size!=0){
             const id=Math.ceil(Math.random()*1000000000000000);
             let newcomment = {
                 pid: props.postcontent.pid,
-                cid: "cid#"+id,
+                cid: "cid#"+id+props.postcontent.pid,
                 comment: Comment,
                 uname: props.user.name,
                 date: today,
                 time: currenttime,
             }
-            storeDataJson("cid#"+id, newcomment);
+            storeDataJson("cid#"+id+props.postcontent.pid, newcomment);
             console.log(newcomment);
             }else{
             alert("Must enter any character");
             }
         setComment("");
         input.current.clear(); 
+
+        let ccount=(Commentno+1)
+        await mergeData(props.postcontent.pid,JSON.stringify({commentcount: ccount}))
+        const id=Math.ceil(Math.random()*1000000000000000);
+        let newnotification = {
+            pid: props.postcontent.pid,
+            nid: "nid#"+id+props.postcontent.pid,
+            author: props.postcontent.uname,
+            uname: props.user.name,
+            date: today,
+            time: currenttime,
+            type: "comment",
+        }
+        storeDataJson("nid#"+id+props.postcontent.pid, newnotification);
+        console.log(newnotification);
+        setCommentno(Commentno+1); 
+
+        
         }
     } />
     </View>

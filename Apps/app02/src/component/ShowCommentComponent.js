@@ -15,10 +15,10 @@ const ShowCommentComponent = (props) => {
         <Text h4Style={{ padding: 10 }} h4>
           {props.title.uname}
         </Text>
-        </View>
-        <Text h6Style={{ padding: 10}} h6 style={{alignSelf:"flex-end",color:'gray'}}>
+        <Text h6Style={{ padding: 10}} h6 style={{alignSelf:"flex-end", color:'gray'}}>
           ( {props.title.time}, {props.title.date} )
         </Text>
+        </View>
       <Text
         style={{
           paddingVertical: 10,
