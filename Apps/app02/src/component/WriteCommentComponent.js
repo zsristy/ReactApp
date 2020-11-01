@@ -36,7 +36,8 @@ const WriteCommentComponent = (props) => {
         {props.postcontent.post}
       </Text>
       <Text h6Style={{ padding: 10 }} h6 style={{color:'gray'}}>
-      <Text style={{fontWeight:"bold" ,fontStyle:"italic",color:'gray'}}>Likes: </Text>{props.postcontent.likecount}
+      <Text style={{fontWeight:"bold" ,fontStyle:"italic",color:'gray'}}>Likes: </Text>{props.postcontent.likecount} 
+      <Text style={{fontWeight:"bold" ,fontStyle:"italic",color:'gray'}}> , Comments: </Text>{props.postcontent.commentcount}
         </Text>
     <Card.Divider />
     <View style={{ flexDirection: "row", justifyContent: "space-between" }}>

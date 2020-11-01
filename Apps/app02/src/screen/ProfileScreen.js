@@ -1,12 +1,38 @@
 import React, { useState,useEffect } from "react";
-import { ImageBackground,View, ScrollView, StyleSheet, AsyncStorage,Image } from "react-native";
+import { ImageBackground,View, ScrollView, StyleSheet, AsyncStorage,FlatList,Image } from "react-native";
 import { Text, Card, Button, Avatar, Header } from "react-native-elements";
 import { FontAwesome5 } from '@expo/vector-icons';
 import {getDataJson, getAllindex} from '../function/AsyncstorageFunction';
+import PostlistComponent from "../component/PostListComponent";
 import { AuthContext } from "../provider/AuthProvider";
 
 
 const ProfileScreen = (props) => {
+
+  const [Post, setPost]=useState([]);
+  const [Render, setRender]=useState(false);
+  const getPost = async () =>{
+    setRender(true);
+    let keys=await getAllindex();
+    let Allposts=[];
+    if(keys!=null){
+      for (let k of keys){
+          if(k.startsWith("pid#")){
+            let post= await getDataJson(k);
+            Allposts.push(post);
+          }
+        }
+        setPost(Allposts);
+      }
+      else{
+        console.log("No post to show");
+      }
+      setRender(false);
+    }
+
+  useEffect(()=>{
+    getPost();
+  },[]);
 
   return (
 
@@ -56,9 +82,26 @@ const ProfileScreen = (props) => {
             </View>         
             <Text style={styles.textStyle1}>  Born On : {auth.CurrentUser.bornon}</Text>
             <Text style={styles.textStyle1}>  Lives At : {auth.CurrentUser.livesat}</Text>
-            <Text style={styles.textStyle1}>  Works At : {auth.CurrentUser.worksat}</Text> 
-            <Text style={styles.textStyle1}>  </Text>       
+            <Text style={styles.textStyle1}>  Works At : {auth.CurrentUser.worksat}</Text>     
           </Card>
+
+          <FlatList
+          data={Post}
+          onRefresh={getPost}
+          refreshing={Render}
+          renderItem={function({item}){
+            if(item.uname==auth.CurrentUser.name){
+            return(
+              <PostlistComponent title={item} user={auth.CurrentUser}
+              />
+            );
+            }
+          }}
+          keyExtractor={(item, index) => index.toString()}
+          >
+          </FlatList> 
+
+
           </ImageBackground>
         </View>
       )}
@@ -95,10 +138,10 @@ textStyle2:{
   fontStyle: "italic"
 },
 imageStyle1:{
-  height: 200,
-  width: 160,
+  height: 120,
+  width: 85,
   alignSelf: 'center',
-  marginTop: 120,
+  marginTop: 40,
 },
 });
 
