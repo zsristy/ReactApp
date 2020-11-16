@@ -1,0 +1,83 @@
+import React, { useState } from "react";
+import { View, StyleSheet } from "react-native";
+import { Input, Button, Card } from "react-native-elements";
+import { FontAwesome, Feather, AntDesign } from "@expo/vector-icons";
+import { AuthContext } from "../providers/AuthProvider";
+import * as firebase from "firebase";
+import Loading from "./../components/Loading";
+
+
+const SignInScreen = (props) => {
+
+  const [Email, setEmail] = useState("");
+  const [Password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+
+  if (isLoading) {
+    return <Loading />;
+  } else {
+
+
+    return (
+      <AuthContext.Consumer>
+        {(auth) => (
+          <View >
+
+            <Card>
+              <Card.Title>Welcome to My Blog!</Card.Title>
+              <Card.Divider />
+
+
+              <Input
+                placeholder="E-mail Address"
+                onChangeText={function (currentInput) {
+                  setEmail(currentInput);
+                }}
+              />
+
+
+              <Input
+                placeholder="Password"
+                secureTextEntry={true}
+                onChangeText={function (currentInput) {
+                  setPassword(currentInput);
+                }}
+              />
+
+
+              <Button
+                title="  Sign In!"
+                onPress={() => {
+                  setIsLoading(true);
+                  firebase
+                    .auth()
+                    .signInWithEmailAndPassword(Email, Password)
+                    .then((userCreds) => {
+                      setIsLoading(false);
+                      auth.setIsLoggedIn(true);
+                      auth.setCurrentUser(userCreds.user);
+                    })
+                    .catch((error) => {
+                      setIsLoading(false);
+                      alert(error);
+                    });
+                }}
+              />
+              <Button
+                title="  Don't have an account?"
+                onPress={function () {
+                  props.navigation.navigate("SignUp");
+                }}
+              />
+              
+            </Card>
+          </View>
+        )}
+      </AuthContext.Consumer>
+    );
+  }
+};
+
+
+export default SignInScreen;
