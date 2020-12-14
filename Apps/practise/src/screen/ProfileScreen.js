@@ -5,49 +5,64 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import {getDataJson, getAllindex, removeData} from '../function/AsyncstorageFunction';
 import PostlistComponent from "../component/PostListComponent";
 import { AuthContext } from "../provider/AuthProvider";
+import * as firebase from "firebase/app";
+require('firebase/auth');
+import "firebase/firestore";
 
 
 const ProfileScreen = (props) => {
-
   const [Post, setPost]=useState([]);
-  const [Render, setRender]=useState(false);
+  const [Data, setData]=useState([]);
 
-  const deleteprofile =async (name,email) =>
-  {
-      let flag=false
-      let index=await getAllindex();
-      if(index!=null){
-        for(let i of index){
-          if(i.endsWith(name)){
-            await removeData((i));
-          }
-        }
+  const getData = async () =>{
+    firebase
+      .firestore()
+      .collection("users")
+      .onSnapshot((querySnapshot) => {
+        let temp_users = [];
+        querySnapshot.forEach((doc) => {
+          temp_users.push({
+            id: doc.id,
+            data: doc.data(),
+          });
+        });
+        setData(temp_users);
+        //setLoading(false);
       }
-      await removeData((email));
-      return flag;
-  }
+      ,(error) => {
+        //setLoading(false);
+        alert(error);
+      });
+    }
 
   const getPost = async () =>{
-    setRender(true);
-    let keys=await getAllindex();
-    let Allposts=[];
-    if(keys!=null){
-      for (let k of keys){
-          if(k.startsWith("pid#")){
-            let post= await getDataJson(k);
-            Allposts.push(post);
-          }
-        }
-        setPost(Allposts);
+    firebase
+      .firestore()
+      .collection("posts")
+      .orderBy("created_at", "desc")
+      .onSnapshot((querySnapshot) => {
+        let temp_posts = [];
+        querySnapshot.forEach((doc) => {
+          temp_posts.push({
+            id: doc.id,
+            data: doc.data(),
+          });
+        });
+        setPost(temp_posts);
+        //setLoading(false);
       }
-      else{
-        console.log("No post to show");
-      }
-      setRender(false);
+      ,(error) => {
+        //setLoading(false);
+        alert(error);
+      });
     }
 
   useEffect(()=>{
     getPost();
+  },[]);
+
+  useEffect(()=>{
+    getData();
   },[]);
 
   return (
@@ -63,13 +78,21 @@ const ProfileScreen = (props) => {
                 props.navigation.toggleDrawer();
               },
             }}
-            centerComponent={{ text: "The Office", style: { color: "#fff" ,fontSize: 20} }}         
+            centerComponent={{ text: "The Office || "+auth.CurrentUser.displayName, style: { color: "#fff" ,fontSize: 20} }}         
             rightComponent={{
               icon: "lock-outline",
               color: "#fff",
               onPress: function () {
-                auth.setIsloggedIn(false);
-                auth.setCurrentUser({});
+                firebase
+                .auth()
+                .signOut()
+                .then(() => {
+                  auth.setIsloggedIn(false);
+                  auth.setCurrentUser({});
+                })
+                .catch((error) => {
+                  alert(error);
+                });
               },
             }}/>
           
@@ -77,50 +100,58 @@ const ProfileScreen = (props) => {
           <ImageBackground source={require('./../../assets/08.jpg')} style={styles.imageStyle}>
             <Card>
             <Image style={styles.imageStyle1} source={require('./../../assets/profile.png')}/>
-            <Text style={styles.textStyle2}> {auth.CurrentUser.name}   </Text>  
-            <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginBottom: 40 }}>
+            <Text style={styles.textStyle2}> {auth.CurrentUser.displayName}   </Text>  
+            <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginBottom: 20 }}>
             <Button
               type="solid"
               title=" Edit Account "
               icon={<FontAwesome5 name="user-edit" size={24} color="white" />}
               onPress={
                 function(){
-                    props.navigation.navigate('EditProfile');
+                    props.navigation.navigate('EditProfile',{title: auth.CurrentUser});
                 }
             }
             />
-            <Button 
-              type="solid" 
-              title=" Delete Account "
-              icon={<FontAwesome5 name="user-times" size={24} color="white" />}
-              onPress={async()=>{
-                let del =await deleteprofile (auth.CurrentUser.name,auth.CurrentUser.email);
-                if(del==false){
-                  alert("User Removed Successfully");
-                  auth.setIsloggedIn(false);
-                  auth.setCurrentUser({});
-              }
-              else{
-                  alert("Delete action unsuccessful");
-              }}
-              }
-              />
 
 
-            </View>         
-            <Text style={styles.textStyle1}>  Born On : {auth.CurrentUser.bornon}</Text>
-            <Text style={styles.textStyle1}>  Lives At : {auth.CurrentUser.livesat}</Text>
-            <Text style={styles.textStyle1}>  Works At : {auth.CurrentUser.worksat}</Text>     
+            {/* <Button
+              type="solid"
+              title=" Testing "
+              icon={<FontAwesome5 name="user-edit" size={24} color="white" />}
+              onPress={
+                function(){
+                    console.log(userDocument(auth.CurrentUser.uid));
+                }
+            }
+            /> */}
+
+
+            </View>
+            <Card.Divider />  
+
+          <FlatList
+          data={Data}
+          renderItem={function({item}){
+            if(item.data.name==auth.CurrentUser.displayName){
+            return(
+              <Text style={styles.textStyle1}>Born On : {item.data.bornon} {'\n'}
+              Lives At : {item.data.livesat} {'\n'} 
+              Works At : {item.data.worksat} {'\n'} </Text>
+            );
+            }
+          }}
+          keyExtractor={(item, index) => index.toString()}
+          >
+          </FlatList>    
+
           </Card>
 
           <FlatList
           data={Post}
-          onRefresh={getPost}
-          refreshing={Render}
           renderItem={function({item}){
-            if(item.uname==auth.CurrentUser.name){
+            if(item.data.userId==auth.CurrentUser.uid){
             return(
-              <PostlistComponent title={item} user={auth.CurrentUser}
+              <PostlistComponent title={item.data} user={auth.CurrentUser}
               />
             );
             }
@@ -153,7 +184,7 @@ const styles = StyleSheet.create({
 textStyle1:{
   fontSize: 20,
   color: 'black',
-  marginLeft: 10,
+  marginLeft: 30,
   marginRight: 10,
   marginTop:10,
 },

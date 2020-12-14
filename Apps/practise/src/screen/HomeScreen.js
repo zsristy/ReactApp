@@ -12,29 +12,35 @@ import ShowPostComponent from "../component/ShowPostComponent";
 import WritePostComponent from "../component/WritePostComponent";;
 import {getDataJson, getAllindex} from '../function/AsyncstorageFunction';
 import { AuthContext } from "../provider/AuthProvider"
+import * as firebase from "firebase/app";
+require('firebase/auth');
+import "firebase/firestore";
 
 
 const HomeScreen = (props) => {
 
   const [Post, setPost]=useState([]);
-  const [Render, setRender]=useState(false);
   const getPost = async () =>{
-    setRender(true);
-    let keys=await getAllindex();
-    let Allposts=[];
-    if(keys!=null){
-      for (let k of keys){
-          if(k.startsWith("pid#")){
-            let post= await getDataJson(k);
-            Allposts.push(post);
-          }
-        }
-        setPost(Allposts);
+    //setLoading(true);
+    firebase
+      .firestore()
+      .collection("posts")
+      .orderBy("created_at", "desc")
+      .onSnapshot((querySnapshot) => {
+        let temp_posts = [];
+        querySnapshot.forEach((doc) => {
+          temp_posts.push({
+            id: doc.id,
+            data: doc.data(),
+          });
+        });
+        setPost(temp_posts);
+        //setLoading(false);
       }
-      else{
-        console.log("No post to show");
-      }
-      setRender(false);
+      ,(error) => {
+        //setLoading(false);
+        alert(error);
+      });
     }
 
   useEffect(()=>{
@@ -54,27 +60,42 @@ const HomeScreen = (props) => {
                 props.navigation.toggleDrawer();
               },
             }}
-            centerComponent={{ text: "The Office", style: { color: "#fff" ,fontSize: 20} }}         
+            centerComponent={{ text: "The Office || "+auth.CurrentUser.displayName, style: { color: "#fff" ,fontSize: 20} }}         
             rightComponent={{
               icon: "lock-outline",
               color: "#fff",
               onPress: function () {
-                auth.setIsloggedIn(false);
-                auth.setCurrentUser({});
+                firebase
+                .auth()
+                .signOut()
+                .then(() => {
+                  auth.setIsloggedIn(false);
+                  auth.setCurrentUser({});
+                })
+                .catch((error) => {
+                  alert(error);
+                });
               },
             }}/>
 
           <ImageBackground source={require('./../../assets/07.jpg')} style={styles.imageStyle}>  
 
           <WritePostComponent user={auth.CurrentUser}/>
+          {/* <Button
+                title="  Test "
+                type="solid"
+                onPress={() => {
+                    //setIsLoading(true);
+                   console.log(auth.CurrentUser.displayName);
+                   console.log(auth.CurrentUser.uid);
+                  }}
+                />  */}
 
           <FlatList
           data={Post}
-          onRefresh={getPost}
-          refreshing={Render}
           renderItem={function({item}){
             return(
-              <ShowPostComponent title={item} user={auth.CurrentUser} link={props.navigation}
+              <ShowPostComponent postid={item.id} title={item.data} user={auth.CurrentUser} link={props.navigation}
               />
             );
           }}

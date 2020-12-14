@@ -2,6 +2,9 @@ import React from "react";
 import { View } from "react-native";
 import { Card, Button, Text, Avatar } from "react-native-elements";
 import { AntDesign } from "@expo/vector-icons";
+import * as firebase from "firebase/app";
+require('firebase/auth');
+import "firebase/firestore";
 
 const ShowCommentComponent = (props) => {
   return (
@@ -13,10 +16,10 @@ const ShowCommentComponent = (props) => {
         }}
       >
         <Text h4Style={{ padding: 10 }} h4>
-          {props.title.uname}
+          {props.title.who}
         </Text>
         <Text h6Style={{ padding: 10}} h6 style={{alignSelf:"flex-end", color:'gray'}}>
-          ( {props.title.time}, {props.title.date} )
+        {new Date(props.title.when.toDate()).toDateString()}
         </Text>
         </View>
       <Text
@@ -24,7 +27,7 @@ const ShowCommentComponent = (props) => {
           paddingVertical: 10,
         }}
       >
-        {props.title.comment}
+        {props.title.body}
       </Text>
     </Card>
   );

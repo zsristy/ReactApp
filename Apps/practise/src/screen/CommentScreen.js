@@ -13,30 +13,38 @@ import WriteCommentComponent from "../component/WriteCommentComponent";
 import ShowCommentComponent from "../component/ShowCommentComponent";
 import {getDataJson, getAllindex} from '../function/AsyncstorageFunction';
 import { AuthContext } from "../provider/AuthProvider"
+import * as firebase from "firebase/app";
+require('firebase/auth');
+import "firebase/firestore";
 
 
 const CommentScreen = (props) => {
   const content=props.route.params.content;
+  const idx=props.route.params.key;
 
   const [Comment, setComment]=useState([]);
-  const [Render, setRender]=useState(false);
   const getComment = async () =>{
-    setRender(true);
-    let keys=await getAllindex();
-    let Allcomments=[];
-    if(keys!=null){
-      for (let k of keys){
-          if(k.startsWith("cid#") && k.endsWith(content.pid)){
-            let comments= await getDataJson(k);
-            Allcomments.push(comments);
-          }
-        }
-        setComment(Allcomments);
-      }
-      else{
-        console.log("No post to show");
-      }
-      setRender(false);
+    //setRender(true);
+    firebase
+    .firestore()
+    .collection('posts')
+    .doc(content.postid)
+    .collection('comments')
+    .orderBy("when", "desc")
+    .onSnapshot((querySnapshot) => {
+      let temp_comments = [];
+      querySnapshot.forEach((doc) => {
+        temp_comments.push({
+          id: doc.id,
+          data: doc.data(),
+        });
+      });
+      setComment(temp_comments);
+      //setLoading(false);
+    },(error) => {
+      //setLoading(false);
+      alert(error);
+    });
     }
 
   useEffect(()=>{
@@ -56,28 +64,44 @@ const CommentScreen = (props) => {
                 props.navigation.toggleDrawer();
               },
             }}
-            centerComponent={{ text: "The Office", style: { color: "#fff" ,fontSize: 20} }}         
+            centerComponent={{ text: "The Office || "+auth.CurrentUser.displayName, style: { color: "#fff" ,fontSize: 20} }}         
             rightComponent={{
               icon: "lock-outline",
               color: "#fff",
               onPress: function () {
-                auth.setIsloggedIn(false);
-                auth.setCurrentUser({});
+                firebase
+                .auth()
+                .signOut()
+                .then(() => {
+                  auth.setIsloggedIn(false);
+                  auth.setCurrentUser({});
+                })
+                .catch((error) => {
+                  alert(error);
+                });
               },
             }}/>
 
           <ImageBackground source={require('./../../assets/04.jpg')} style={styles.imageStyle}>  
 
-          <WriteCommentComponent user={auth.CurrentUser} postcontent={content}/>
+          <WriteCommentComponent user={auth.CurrentUser} postcontent={content} pid={idx}/>
+             
+             
+             {/* <Button
+                title="  Test "
+                type="solid"
+                onPress={() => {
+                    //setIsLoading(true);
+                   console.log(idx);
+                  }}
+                />  */}
+
 
           <FlatList
           data={Comment}
-          onRefresh={getComment}
-          refreshing={Render}
           renderItem={function({item}){
             return(
-              <ShowCommentComponent title={item}
-              />
+              <ShowCommentComponent title={item.data}/>
             );
           }}
           keyExtractor={(item, index) => index.toString()}

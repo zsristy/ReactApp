@@ -3,8 +3,9 @@ import {ImageBackground,Text,SafeAreaView, StyleSheet} from 'react-native';
 import {Input, Button, Card} from 'react-native-elements';
 import { Fontisto, Feather, FontAwesome  } from '@expo/vector-icons';
 import {AuthContext} from '../provider/AuthProvider';
-import {getDataJson} from '../function/AsyncstorageFunction';
-
+import * as firebase from "firebase/app";
+require('firebase/auth');
+import "firebase/firestore";
 
 const SigninScreen=(props)=>{
     const [Email, setEmail]=useState("");
@@ -39,16 +40,21 @@ const SigninScreen=(props)=>{
                 icon={<FontAwesome name="sign-in" size={24} color="white" />}
                 title="  Sign In"
                 type="solid"
-                onPress={async function(){
-                    let UserData = await getDataJson(Email);
-                    if(UserData.password==Password){
+                onPress={async() => {
+                    //setIsLoading(true);
+                    firebase
+                      .auth()
+                      .signInWithEmailAndPassword(Email, Password)
+                      .then((userCreds) => {
+                        //setIsLoading(false);
                         auth.setIsloggedIn(true);
-                        auth.setCurrentUser(UserData);
-                    }
-                    else{
-                        alert("Wrong Email/Password !!");
-                    }
-                }}
+                        auth.setCurrentUser(userCreds.user);
+                      })
+                      .catch((error) => {
+                        //setIsLoading(false);
+                        alert(error);
+                      });
+                  }}
                 /> 
                 <Button
                 title="  Haven't Signed Up !!"

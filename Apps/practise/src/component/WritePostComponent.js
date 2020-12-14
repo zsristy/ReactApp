@@ -1,15 +1,15 @@
 import React,{useReducer, useState} from "react";
-import { View } from "react-native";
 import { Card, Button, Text, Avatar,   Input } from "react-native-elements";
-import {storeDataJson} from '../function/AsyncstorageFunction';
 import { Entypo } from "@expo/vector-icons";
+import * as firebase from "firebase/app";
+require('firebase/auth');
+import "firebase/firestore";
 
 
 const WritePostComponent = (props) => {
     const [Post, setPost]=useState("");
     const input = React.createRef();
-    let today = new Date().toLocaleDateString();
-    let currenttime = new Date().toLocaleTimeString();
+
   return (
     <Card>
     <Input
@@ -25,17 +25,30 @@ const WritePostComponent = (props) => {
     <Button title="Post" type="outline" onPress={
         function(){
             if(Post.size!=0){
-            const id=Math.ceil(Math.random()*1000000000000000);
-            let newpost = {
-                pid: "pid#"+id+props.user.name,
-                post: Post,
-                uname: props.user.name,
-                date: today,
-                time: currenttime,
-                likecount: 0,
-                commentcount: 0,
-            };
-            storeDataJson("pid#"+id+props.user.name, newpost);
+                const id=Math.ceil(Math.random()*1000000000000000);
+                //setLoading(true);
+                firebase
+                  .firestore()
+                  .collection("posts")
+                  .add({
+                    postid: "pid#"+id,
+                    userId: props.user.uid,
+                    body: Post,
+                    author: props.user.displayName,
+                    created_at: firebase.firestore.Timestamp.now(),
+                    likes: 0,
+                    comments: 0,
+                  })
+                  .then((docRef) => {
+                    //setLoading(false);
+                    alert("Post created Successfully! Post ID: "+ docRef.id);
+                  })
+                  .catch((error) => {
+                    //setLoading(false);
+                    alert(error);
+                  });
+                // console.log(props.user.uid);
+                // console.log(props.user.displayName)
             }else{
             alert("Must enter any character");
             }

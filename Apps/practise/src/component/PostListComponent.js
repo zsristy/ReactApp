@@ -22,31 +22,32 @@ const PostlistComponent = (props) => {
           activeOpacity={1}
         />
         <Text h4Style={{ padding: 10 }} h4>
-          {props.title.uname}
+          {props.title.author}
         </Text>
         </View>
         <Text h6Style={{ padding: 10}} h6 style={{alignSelf:"stretch",color:'gray'}}>
-          <Text style={{fontWeight:"bold" ,fontStyle:"italic",color:'gray'}}>Posted at: </Text>{props.title.time}, {props.title.date}
+          <Text style={{fontWeight:"bold" ,fontStyle:"italic",color:'gray'}}>Posted on: </Text>{new Date(props.title.created_at.toDate()).toDateString()}
         </Text>
       <Text
         style={{
           paddingVertical: 10,
         }}
       >
-        {props.title.post}
+        {props.title.body}
       </Text>
+      <Card.Divider />
       <Text h6Style={{ padding: 10 }} h6 style={{color:'gray'}}>
-      <Text style={{fontWeight:"bold" ,fontStyle:"italic",color:'gray'}}>Likes: </Text>{props.title.likecount} 
-      <Text style={{fontWeight:"bold" ,fontStyle:"italic",color:'gray'}}> , Comments: </Text>{props.title.commentcount}
+      <Text style={{fontWeight:"bold" ,fontStyle:"italic",color:'gray'}}>Likes: </Text>{props.title.likes} 
+      <Text style={{fontWeight:"bold" ,fontStyle:"italic",color:'gray'}}> , Comments: </Text>{props.title.comments}
         </Text>
-        <Card.Divider />
+
       <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
     
-        <Button type="solid" title="Remove" onPress={
+        {/* <Button type="solid" title="Remove" onPress={
           async function(){
           await removeData((props.title.pid));
           }
-        }/>
+        }/> */}
         </View>
     </Card>
   );

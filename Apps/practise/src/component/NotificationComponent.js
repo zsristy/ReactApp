@@ -3,8 +3,8 @@ import { View,TouchableOpacity } from "react-native";
 import { Card, Button, Text, Avatar } from "react-native-elements";
 import {getDataJson, getAllindex} from '../function/AsyncstorageFunction';
 
+
 const NotificationComponent = (props) => {
-  // let post= getDataJson(props.title.pid);
   let notation;
   let bcolor;
   let nm;
@@ -20,9 +20,7 @@ const NotificationComponent = (props) => {
   }
   return (
     <TouchableOpacity onPress={async function(){
-      let post= await getDataJson(props.title.pid);
-      props.link.navigate('Comment',{content: post}); //props.link.navigate('Comment',{content: post._W});
-      console.log(post._W);
+      props.link.navigate('Comment',{key: props.title.pid, content: props.title}); 
     }}>
     <Card>
     <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -38,7 +36,7 @@ const NotificationComponent = (props) => {
         activeOpacity={1}
       />
       <Text style={{ paddingHorizontal: 10 }}>
-      <Text style={{fontWeight:"bold" ,fontStyle:"italic"}}>{props.title.uname} </Text> {notation} Your Post.
+      <Text style={{fontWeight:"bold" ,fontStyle:"italic"}}>{props.title.from} </Text> {notation} Your Post.
       </Text>
     </View>
   </Card>

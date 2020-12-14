@@ -4,27 +4,31 @@ import { Header} from "react-native-elements";
 import {getDataJson, getAllindex} from '../function/AsyncstorageFunction';
 import NotificationComponent from '../component/NotificationComponent';
 import { AuthContext } from "../provider/AuthProvider"
+import * as firebase from "firebase/app";
+require('firebase/auth');
+import "firebase/firestore";
 
 const NotificationScreen = (props) => {
   const [Notification, setNotification]=useState([]);
-  const [Render, setRender]=useState(false);
   const getNotification = async () =>{
-    setRender(true);
-    let keys=await getAllindex();
-    let Allnotifications=[];
-    if(keys!=null){
-     for (let k of keys){
-          if(k.startsWith("nid#") ){
-            let notification= await getDataJson(k);
-            Allnotifications.push(notification);
-          }
-        }
-        setNotification(Allnotifications);
-       }
-      else{
-        console.log("No post to show");
-      }
-       setRender(false);
+    firebase
+    .firestore()
+    .collection("notifications")
+    .orderBy("time", "desc")
+    .onSnapshot((querySnapshot) => {
+      let temp_notifications = [];
+      querySnapshot.forEach((doc) => {
+        temp_notifications.push({
+          id: doc.id,
+          data: doc.data(),
+        });
+      });
+      setNotification(temp_notifications);
+      //setLoading(false);
+    },(error) => {
+      //setLoading(false);
+      alert(error);
+    });
   }
 
 
@@ -44,24 +48,29 @@ const NotificationScreen = (props) => {
                 props.navigation.toggleDrawer();
               },
             }}
-            centerComponent={{ text: "The Office", style: { color: "#fff" ,fontSize: 20} }}         
+            centerComponent={{ text: "The Office || "+auth.CurrentUser.displayName, style: { color: "#fff" ,fontSize: 20} }}         
             rightComponent={{
               icon: "lock-outline",
               color: "#fff",
               onPress: function () {
-                auth.setIsloggedIn(false);
-                auth.setCurrentUser({});
+                firebase
+                .auth()
+                .signOut()
+                .then(() => {
+                  auth.setIsloggedIn(false);
+                  auth.setCurrentUser({});
+                },(error) => {
+                  alert(error);
+                });
               },
             }}/>
           <ImageBackground source={require('./../../assets/05.jpg')} style={styles.imageStyle}> 
           <FlatList
           data={Notification}
-          onRefresh={getNotification}
-          refreshing={Render}
           renderItem={function({item}){
-            if(item.author==auth.CurrentUser.name){
+            if(item.data.userId==auth.CurrentUser.uid){
             return(
-                  <NotificationComponent title={item} link={props.navigation}/>
+                  <NotificationComponent title={item.data} link={props.navigation}/>
             );}
           }}
           keyExtractor={(item, index) => index.toString()}

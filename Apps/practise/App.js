@@ -14,6 +14,24 @@ import SigninScreen from './src/screen/SigninScreen';
 import ProfileScreen from './src/screen/ProfileScreen';
 import CommentScreen from './src/screen/CommentScreen';
 import EditProfileScreen from './src/screen/EditProfileScreen';
+import * as firebase from 'firebase/app';
+
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA92gcZJFsWmMqJHIb2ceU_RM7hITS9pr4",
+  authDomain: "blog-183c8.firebaseapp.com",
+  projectId: "blog-183c8",
+  storageBucket: "blog-183c8.appspot.com",
+  messagingSenderId: "943473434762",
+  appId: "1:943473434762:web:e7705d069142f4393acd73"
+};
+
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
 
 const AuthStack =createStackNavigator();
 const HomeTab = createMaterialBottomTabNavigator();

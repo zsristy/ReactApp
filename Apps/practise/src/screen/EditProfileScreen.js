@@ -1,14 +1,21 @@
 import React, { useState,useEffect } from "react";
 import { ImageBackground,View, ScrollView, StyleSheet, AsyncStorage,Image } from "react-native";
 import { Text, Card, Button, Avatar, Header,Input } from "react-native-elements";
+import DatePicker from 'react-native-datepicker'
 import { FontAwesome5 } from '@expo/vector-icons';
 import {storeDataJson, mergeData, removeData} from '../function/AsyncstorageFunction';
 import { AuthContext } from "../provider/AuthProvider";
+import * as firebase from "firebase/app";
+require('firebase/auth');
+import "firebase/firestore";
 
 const EditProfileScreen = (props) => { 
-const [Bornon, setBornon]=useState("");
-const [Livesat, setLivesat]=useState("");
-const [Worksat, setWorksat]=useState("");
+const content=props.route.params.title
+const [Bornon, setBornon]=useState(content.bornon);
+const [Livesat, setLivesat]=useState(content.livesat);
+const [Worksat, setWorksat]=useState(content.worksat);
+
+
   return (
     <AuthContext.Consumer>
       {(auth) => (
@@ -21,31 +28,47 @@ const [Worksat, setWorksat]=useState("");
                 props.navigation.toggleDrawer();
               },
             }}
-            centerComponent={{ text: "The Office", style: { color: "#fff" ,fontSize: 20} }}         
+            centerComponent={{ text: "The Office || "+auth.CurrentUser.displayName, style: { color: "#fff" ,fontSize: 20} }}         
             rightComponent={{
               icon: "lock-outline",
               color: "#fff",
               onPress: function () {
-                auth.setIsloggedIn(false);
-                auth.setCurrentUser({});
+                firebase
+                .auth()
+                .signOut()
+                .then(() => {
+                  auth.setIsloggedIn(false);
+                  auth.setCurrentUser({});
+                })
+                .catch((error) => {
+                  alert(error);
+                });
               },
             }}/>
           <ImageBackground source={require('./../../assets/08.jpg')} style={styles.imageStyle}>
             <Card >
             <Image style={styles.imageStyle1} source={require('./../../assets/profile.png')}/>
-            <Text style={styles.textStyle2}> {auth.CurrentUser.name}   </Text>  
+            <Text style={styles.textStyle2}> {auth.CurrentUser.displayName}   </Text>  
             <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginBottom: 40 }}>
             </View>  
-            <Card.Divider/>      
-            <Input 
-                placeholder='Born On'
-                onChangeText={
-                    function(currentinput){
-                        setBornon(currentinput);
-                    }
-                }
-                ></Input>
-
+            <Card.Divider/> 
+            <View style={{ flexDirection: "row", justifyContent: "flex-start" }}>
+            <Text style={styles.textStyle1}>Born On</Text> 
+            <DatePicker
+                date={Bornon}
+                mode="date"
+                androidMode="spinner"
+                customStyles={{
+                  dateInput: {
+                    marginLeft: 10
+                    ,
+                  },
+                }}
+                onDateChange={(date) => {
+                  setBornon(date);
+                }}
+            />   
+            </View>
                 <Input 
                 placeholder='Lives At' 
                 onChangeText={
@@ -70,13 +93,24 @@ const [Worksat, setWorksat]=useState("");
               icon={<FontAwesome5 name="user-edit" size={24} color="white" />}
               onPress={   
                 async function(){
-                await mergeData(auth.CurrentUser.email,JSON.stringify({
-                    bornon: Bornon,
-                    livesat: Livesat,
-                    worksat: Worksat,
-                }))
-                alert("Please logout first and then log in again to see the update :) ");
+                  firebase
+                  .firestore()
+                  .collection("users")
+                  .doc(auth.CurrentUser.uid)
+                  .update({
+                      bornon: Bornon,
+                      livesat: Livesat,
+                      worksat: Worksat,
+                  })
+                  .catch((error) => {
+                    //setLoading(false);
+                    alert(error);
+                  });
+                  
+
+                  props.navigation.navigate('Profile');
                 }
+                
             }
             />
 
@@ -102,11 +136,12 @@ const styles = StyleSheet.create({
     justifyContent: "center"
 },
 textStyle1:{
-  fontSize: 20,
-  color: 'black',
+  fontSize: 18,
+  color: 'gray',
   marginLeft: 10,
   marginRight: 10,
   marginTop:10,
+  marginBottom:25
 },
 textStyle2:{
   fontSize: 20,
@@ -121,6 +156,10 @@ imageStyle1:{
   alignSelf: 'center',
   marginTop: 40,
 },
+// datePickerStyle: {
+//   width: 200,
+//   marginTop: 20,
+// },
 });
 
 export default EditProfileScreen;

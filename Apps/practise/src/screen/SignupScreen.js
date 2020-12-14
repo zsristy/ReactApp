@@ -2,7 +2,9 @@ import React, {useState} from 'react';
 import {ImageBackground,Text, SafeAreaView, StyleSheet} from 'react-native';
 import {Input, Button, Card} from 'react-native-elements';
 import { Fontisto, Feather, FontAwesome, AntDesign  } from '@expo/vector-icons';
-import {storeDataJson} from '../function/AsyncstorageFunction';
+import * as firebase from "firebase/app";
+require('firebase/auth');
+import "firebase/firestore";
 
 const SignupScreen=(props)=>{
     const [Name, setName]=useState("");
@@ -61,21 +63,49 @@ const SignupScreen=(props)=>{
                 icon={<FontAwesome name="sign-in" size={24} color="white" />}
                 title="  Sign Up"
                 type="solid"
-                onPress={
-                    function(){
-                        let currentuser = {
-                            name: Name,
-                            email: Email,
-                            sid: Sid,
-                            password: Password,
-                            bornon: "Not set yet",
-                            livesat: "Not set yet",
-                            worksat: "Not set yet",
-                        };
-                        storeDataJson(Email,currentuser);
-                        props.navigation.navigate('SignIn');
+                onPress={async () => {
+                    if (Name && Sid && Email && Password) {
+                      //setIsLoading(true);
+                      firebase
+                        .auth()
+                        .createUserWithEmailAndPassword(Email, Password)
+                        .then((userCreds) => {
+      
+                          userCreds.user.updateProfile({ displayName: Name });
+                          firebase
+                            .firestore()
+                            .collection("users")
+                            .doc(userCreds.user.uid)
+                            .set({
+                              name: Name,
+                              sid: Sid,
+                              email: Email,
+                              bornon: "",
+                              livesat: "",
+                              worksat: "",
+                            })
+      
+                            .then(() => {
+                              //setIsLoading(false);
+                              alert("Account created successfully!  User ID: "+userCreds.user.uid);
+                              console.log(userCreds.user)
+                              props.navigation.navigate("SignIn");
+                            })
+      
+                            .catch((error) => {
+                              //setIsLoading(false);
+                              alert(error);
+                            });
+                        })
+      
+                        .catch((error) => {
+                          //setIsLoading(false);
+                          alert(error);
+                        });
+                    } else {
+                      alert("Fields can not be empty!");
                     }
-                }
+                  }}
                 /> 
 
                 <Button
